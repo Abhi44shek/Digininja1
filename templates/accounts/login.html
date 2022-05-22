@@ -1,5 +1,7 @@
 {% extends '../layout/base.html' %} {% load static %} {% block css %} {% endblock css %} {% block body %}
 
+
+
 <body class="main-layout inner_page">
     <!-- loader  -->
     <div class="loader_bg">
@@ -22,7 +24,7 @@
                         {% if msg %} {{ msg | safe }} {% else %} Add your credentials {% endif %}
                     </p>
                 </div>
-                <form method="post" action="" class="mt-4">
+                <form method="post" action="" class="mt-5">
 
                     {% csrf_token %} {{form.as_p}}
                     <div class="d-grid">
