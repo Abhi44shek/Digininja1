@@ -3,11 +3,17 @@ from django.contrib import messages
 from pytrends.request import TrendReq
 from home.models import Search
 import os
+from django.contrib.auth.decorators import login_required
+from plotly import graph_objects as go
+import pandas as pd
+import plotly.express as px
 
 # Create your views here.
+@login_required
 def index(request):
     return render(request,'home/index.html')
 
+@login_required
 def search(request):
     if request.method == 'POST':
 
@@ -18,13 +24,17 @@ def search(request):
         
         elif query:
             filepath = f'media/queries/{query}.json'
-            if not os.path.exists(filepath):
+            filekeywords = f'media/queries/{query}_keywords.json'
+            print('---->',not os.path.exists(filepath) and not os.path.exists(filekeywords))
+            if not os.path.exists(filepath) or not os.path.exists(filekeywords):
                 s = Search(query=query,user=request.user)
                 s.save()
                 pytrends = TrendReq(hl='en-US', tz=360)
-                kw_list = [query]
-                pytrends.build_payload(kw_list, cat=0, timeframe='today 5-y', geo='IN', gprop='news')
+                pytrends.build_payload([query], cat=0, timeframe='today 5-y', geo='IN', gprop='news')
+                keywords = pytrends.suggestions(keyword=query)
+                print(keywords)
                 df = pytrends.interest_over_time()
+                dfk = pd.DataFrame(keywords)
                 if df is not None:
                     if not os.path.exists('media/queries'):
                         os.makedirs('media/queries')
@@ -32,18 +42,42 @@ def search(request):
                     messages.success(request, 'data found.')
                 else:            
                     messages.success(request, 'no data found.')
-            return render(request,'home/search.html',context={'s':query})
+                if dfk is not None:
+                    if not os.path.exists('media/queries'):
+                        os.makedirs('media/queries')
+                    dfk.to_json(filekeywords)
+                    messages.success(request, 'keywords found.')
+            else:
+                messages.success(request, 'data found.')
+            df_trend = pd.read_json(filepath)
+            df_keywords = pd.read_json(filekeywords)
+            fig = px.area(df_trend, x=df_trend.index, y=df_trend.columns[0], title=f'{df_trend.columns[0]} Searches over time')
+            fig.update_layout({
+                'height': 500,
+            })
+            ctx = {
+                's':query,
+                'fig':fig.to_html(),
+                'df_trends':df_trend.tail(5)[[query]].to_html(),
+                'df_keywords':df_keywords[['title','type']].to_html()
+            }
+            return render(request,'home/search.html',context=ctx)
     return redirect('/')
 
 
 def blog(request):
     return render(request,'home/blog.html')
+
 def about(request):
     return render(request,'home/about.html')
+
 def contact(request):
+    
     return render(request,'home/contact.html')
+
 def service(request):
     return render(request,'home/service.html')
+
 def login(request):
     return render(request,'accounts/login.html')
 
