@@ -7,11 +7,37 @@ from django.contrib.auth.decorators import login_required
 from plotly import graph_objects as go
 import pandas as pd
 import plotly.express as px
+import tweepy
+
+
+def get_trending_tweet(query):
+    ck="<consumer-token>"
+    cs= "<consumer-token-secret>"
+    at = '<access-token>'
+    ats= '<access-token-secret>'
+    auth = tweepy.OAuthHandler(ck,cs,at,ats)
+    api = tweepy.API(auth)
+    results = api.search_tweets(query)
+    print(len(results))
+    if len(results) > 0:
+        tweet_results = []
+        for tweet in results:
+            tweet_results.append({
+                'tweet':tweet.text,
+                'date':tweet.created_at,
+                'retweets':tweet.retweet_count,
+                'likes':tweet.favorite_count,
+            })
+        return tweet_results
+    else:
+        return None
 
 # Create your views here.
 @login_required
 def index(request):
     return render(request,'home/index.html')
+
+
 
 @login_required
 def search(request):
@@ -59,7 +85,8 @@ def search(request):
                 's':query,
                 'fig':fig.to_html(),
                 'df_trends':df_trend.tail(5)[[query]].to_html(),
-                'df_keywords':df_keywords[['title','type']].to_html()
+                'df_keywords':df_keywords[['title','type']].to_html(),
+                'tweet_results':get_trending_tweet(query),
             }
             return render(request,'home/search.html',context=ctx)
     return redirect('/')
