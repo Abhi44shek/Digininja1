@@ -15,6 +15,10 @@ class Contact(models.Model):
     email=models.EmailField()
     phone=models.CharField(max_length=25)
     subject=models.CharField(max_length=25)
+    
+    
 
     def __str__(self):
         return self.name
+
+

@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from pytrends.request import TrendReq
-from home.models import Search
+from home.models import Search,Contact
 import os
 from django.contrib.auth.decorators import login_required
 from plotly import graph_objects as go
@@ -92,15 +92,24 @@ def search(request):
     return redirect('/')
 
 
-def blog(request):
-    return render(request,'home/blog.html')
+
 
 def about(request):
     return render(request,'home/about.html')
 
 def contact(request):
+    if request.method == 'POST':
+        name = request.POST['name']
+        email = request.POST['email']
+        phone = request.POST['phone']
+        subject = request.POST['subject']
+        print(name, email, phone, subject)
+        contact = Contact(name=name,email=email,phone=phone,subject=subject)
+        contact.save()
+
+    return render(request, 'home/contact.html')
     
-    return render(request,'home/contact.html')
+    
 
 def service(request):
     return render(request,'home/service.html')
