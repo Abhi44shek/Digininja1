@@ -8,13 +8,15 @@ from plotly import graph_objects as go
 import pandas as pd
 import plotly.express as px
 import tweepy
+from django.conf import settings
+
 
 
 def get_trending_tweet(query):
-    ck="<consumer-token>"
-    cs= "<consumer-token-secret>"
-    at = '<access-token>'
-    ats= '<access-token-secret>'
+    ck=settings.TWITTER_CONSUMER_KEY
+    cs= settings.TWITTER_CONSUMER_SECRET
+    at = settings.TWITTER_ACCESS_TOKEN_KEY
+    ats= settings.TWITTER_ACCESS_TOKEN_SECRET
     auth = tweepy.OAuthHandler(ck,cs,at,ats)
     api = tweepy.API(auth)
     results = api.search_tweets(query)
@@ -22,6 +24,7 @@ def get_trending_tweet(query):
     if len(results) > 0:
         tweet_results = []
         for tweet in results:
+          
             tweet_results.append({
                 'tweet':tweet.text,
                 'date':tweet.created_at,

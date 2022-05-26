@@ -11,10 +11,13 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env()
+environ.Env.read_env()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -133,3 +136,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = 'authen:login'
+
+TWITTER_CONSUMER_KEY = env('CONSUMER_KEY')
+TWITTER_CONSUMER_SECRET = env('CONSUMER_SECRET')
+TWITTER_ACCESS_TOKEN_KEY = env('ACCESS_TOKEN_KEY')
+TWITTER_ACCESS_TOKEN_SECRET = env('ACCESS_SECRET')
+
