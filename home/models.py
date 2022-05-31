@@ -22,3 +22,14 @@ class Contact(models.Model):
         return self.name
 
 
+class Subscriber(models.Model):
+    email=models.EmailField()
+
+    def __str__(self):
+        return self.email
+class Feedback(models.Model):
+    mail=models.EmailField()
+    msg=models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.msg

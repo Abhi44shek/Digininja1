@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from pytrends.request import TrendReq
-from home.models import Search,Contact
+from home.models import Feedback, Search,Contact,Subscriber
 import os
 from django.contrib.auth.decorators import login_required
 from plotly import graph_objects as go
@@ -113,7 +113,19 @@ def contact(request):
     return render(request, 'home/contact.html')
     
     
-
+def subscriber(request):
+    if request.method == 'POST':
+        email =request.POST['email']
+        sub=Subscriber(email=email)
+        sub.save()
+    return render(request,'home/index.html')
+def feedback(request):
+    if request.method == 'POST':
+        mail =request.POST['email']
+        msg =request.POST['msg']
+        feed=Feedback(email=mail,msg=msg)
+        feed.save()
+    return render(request,'home/index.html')
 def service(request):
     return render(request,'home/service.html')
 
